@@ -1,0 +1,21 @@
+Experiment_name	Name	Single cells/morphology/viability | Count	Viability 	Leukocyte/CD45+	Tcell/CD45+/CD3+	Tcell CD4/CD45+/CD3+/CD4+ 	T cell CD8/CD45+/CD3+/CD8a+	B cell/CD45+/CD19+	Neutrophil/CD16+ CD66b+	Monocyte Intermediate/CD14++CD16++	Monocyte Classical CD14++CD16-	Monocyte NonClassical/CD14+CD16++ 	NK/CD14- CD16+
+93Ficoll	Sample1Ficoll	46325	98.60%	99.40%	78.00%	29.60%	31.80%	5.65%	8.69E-05	0.06%	2.94%	0.11%	2.99%
+94Ficoll	Sample2Ficoll	53908	98.70%	97.90%	65.60%	42.20%	12.80%	5.87%	0.01%	0.27%	4.31%	0.51%	11.80%
+95Ficoll	Sample3Ficoll	26983	98.80%	98.40%	45.60%	18.00%	11.40%	11.20%	0.03%	1.15%	7.77%	1.11%	7.70%
+96Ficoll	Sample4Ficoll	24291	97.30%	98.30%	63.20%	26.80%	15.80%	3.37%	4.19E-05	0.28%	10.80%	0.23%	5.98%
+93Kit	Sample1Kit	666	98.80%	98.20%	62.50%	16.70%	27.10%	7.65%	0%	0%	3.67%	0%	7.49%
+94Kit	Sample2Kit	43014	98.70%	99.40%	59.10%	32.80%	15.70%	5.85%	7.01E-05	0.70%	11.70%	0.27%	11.90%
+95Kit	Sample3Kit	61775	97.10%	98.70%	48.90%	20.70%	15.80%	8.37%	0.03%	2.17%	18.90%	0.59%	8.34%
+96Kit	Sample4Kit	33873	98.80%	99.50%	66.80%	26.70%	21.40%	2.52%	2.97E-05	0.37%	12.40%	0.16%	7.66%
+Mean		36354											
+SD		19314											
+													
+													
+													
+													
+													
+													
+													
+													
+													
+													
