@@ -46,7 +46,7 @@ pb.meta.object<-AggregateExpression(int.all.objects, return.seurat = T,
 matrix.meta.object<-as.matrix(GetAssayData(pb.meta.object, layer = 'data')[, WhichCells(pb.meta.object)])
 
 #Write objects
-fwrite(matrix.meta.object, "res/meta-object-aggregatecounts.txt", row.names = TRUE, col.names = TRUE)
+fwrite(matrix.meta.object, "meta-object-aggregatecounts.txt", row.names = TRUE, col.names = TRUE)
 
 #Read gene vectors
 #Genes from Massoni-Badossa et al.
@@ -58,7 +58,7 @@ features.time <- c("H3F3B",  "NEAT1", "SRGN", "SERF2","CFL1","MYL12A",
                    "KLF6","SAT1","GIMAP7")
 
 #Read object
-aggregatecounts<-read.csv("~/res/meta-object-aggregatecounts.txt", header = TRUE)
+aggregatecounts<-read.csv("~/meta-object-aggregatecounts.txt", header = TRUE)
 
 # Exclude the 'column1' column
 colnames_split <- strsplit(colnames(aggregatecounts)[-1], "_")  
@@ -200,7 +200,6 @@ stressg<-ggplot(df_long.stress2.1, aes(x = Dataset, y = sumexp_stress, fill = Pr
   )
 
 
-ggsave(filename = "~/res/Figs/stress-genes.svg", plot = stressg, device = "svg",width = 12, height = 8, dpi=300)
 ggsave(filename = "~/res/Figs/stress-genes.jpg", plot = stressg, device = "jpg",width = 12, height = 8, dpi=300)
 
 ##Plot for TIME dependent gene expression
