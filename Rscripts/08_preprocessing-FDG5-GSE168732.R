@@ -90,6 +90,3 @@ kawa.df<-as.data.frame(conteo.kawa)
 
 DimPlot(int.kawasaki, reduction = "umap.cca.ka", label = T, pt.size = 2, label.size = 5, group.by = "idents")+NoLegend()
 
-fwrite(kawa.df, "res/dataframes-t-count/kawa-df.txt")
-
-saveRDS(int.kawasaki.ann, "res/int-annotated-datasets/int-kawasaki-ann.rds")
