@@ -65,7 +65,8 @@ us to assess whether expression profile biases are protocol-dependent, providing
 
 ## Data availability
 
-ENA Accession number: E-MTAB-15719
+ENA Accession number: E-MTAB-15719 []
+Additional files: Zenodo [10.5281/zenodo.19224509]
 
 
 ## Citation
