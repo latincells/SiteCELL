@@ -3,8 +3,6 @@ This repository contains the analysis pipeline for comparing PBMC isolation prot
 The analysis focuses on cell composition, cell quality metrics, and transcriptomic stress signatures, particularly in samples from diverse ancestry backgrounds. This protocol
 is part of the LatinCells project which aims to map an immune atlas of indigenous and admixed Latin American populations.
 
----
-
 ## How to run
 
 Run scripts in the following order:
@@ -25,13 +23,11 @@ Each dataset is processed independently, including quality control, filtering, a
   - `07_preprocessing-FDG4-GSE213516.R`
   - `08_preprocessing-FDG5-GSE168732.R`
 
-  ### 2. Dataset integration
+### 2. Dataset integration
 
 All processed datasets are merged and integrated into a unified Seurat object.
 
 - `09_01-all-datasets-merge-and-integration.R`
-
----
 
 ### 3. Downstream analyses
 
@@ -71,7 +67,7 @@ us to assess whether expression profile biases are protocol-dependent, providing
 
 ## Data availability
 
-ENA Accession number: E-MTAB-15719 
+ENA Accession number: E-MTAB-15719
 
 ---
 
