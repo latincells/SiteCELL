@@ -63,21 +63,14 @@ at the individual level of cells recovered per sample. This per-individual appro
 mitochondrial RNA, stress genes) and cell recovery and viability, enabling us to quantify potential artifacts introduced during isolation and processing. This framework allowed 
 us to assess whether expression profile biases are protocol-dependent, providing a comprehensive evaluation of protocol performance.
 
----
 
 ## Data availability
 
 ENA Accession number: E-MTAB-15719
 
----
 
 ## Citation
 
 If you use this code, please cite:
 
-Espinosa-Jaime, Aarón, et al. "SiteCELL enables on-site PBMCs purification and cryopreservation for immune single cell profiling of diverse ancestries." bioRxiv (2025): 2025-09. ** Accepted
----
-
-## Author
-
-Aaron E. Jaime  
+Espinosa-Jaime, Aarón, et al. "SiteCELL enables on-site PBMCs purification and cryopreservation for immune single cell profiling of diverse ancestries." bioRxiv (2025): 2025-09. 
