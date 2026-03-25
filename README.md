@@ -9,7 +9,7 @@ is part of the LatinCells project which aims to map an immune atlas of indigenou
 
 ├── data/                # Main RDS object containing datasets
 ├── scripts/             # Analysis scripts    
-├── docs/                # Additional documentation  
+└──  docs/                # Additional documentation  
 
 ---
 
@@ -17,28 +17,52 @@ is part of the LatinCells project which aims to map an immune atlas of indigenou
 
 Run scripts in the following order:
 
-1. Preprocessing, QC and annotation 
-   `Rscript/Preprocessing/01_preprocessing-SiteCell-Dataset1.R`
-   `Rscript/Preprocessing/02_preprocessing-SiteCell-Dataset2.R`
-   `Rscript/Preprocessing/03_preprocessing-SiteCell-Dataset2.R`
-   `Rscript/Preprocessing/04_preprocessing-FDG1-GSE226896.R`
-   `Rscript/Preprocessing/05_preprocessing-FDG2-GSE149689.R`
-   `Rscript/Preprocessing/06_preprocessing-FDG3-GSE161918.R`
-   `Rscript/Preprocessing/07_preprocessing-FDG4-GSE213516.R`
-   `Rscript/Preprocessing/08_preprocessing-FDG5-GSE168732.R`
-   
-2. Downstream analysis (cell proportion, stress genes, matching samples, replicate sample)
-   `Rscript/Downstream-analysis/09_01-all-datasets-merge-and-integration.R`
-   `Rscript/Downstream-analysis/09_02-experiment-mitoRNAanalysis.R`
-   `Rscript/Downstream-analysis/09_03-experiment-cellproportion-calculation.R`
-   `Rscript/Downstream-analysis/09_04-experiment-StressGenesAnalyses.R`
-   `Rscript/Downstream-analysis/09_05-experiment-subT-diversity.R`
-   `Rscript/Downstream-analysis/09_01-all-datasets-merge-and-integration.R`
-   `Rscript/Downstream-analysis/10-experiment-FigS4-replicate-MX0049.R`
-   `Rscript/Downstream-analysis/11-experiment-comparison-SiteCELL-with-HIHA_dataset.R`
-   `Rscript/Downstream-analysis/12_01-preprocessing-matching-samples-with-SiteCELL.R`
-   `Rscript/Downstream-analysis/12_02-preprocessing-matching-samples-with-FDG.R`
-   `Rscript/Downstream-analysis/supplementary-fig2.R`
+### 1. Preprocessing and QC (per dataset)
+
+Each dataset is processed independently, including quality control, filtering, and cell type annotation.
+
+- SiteCELL datasets:
+  - `01_preprocessing-SiteCell-Dataset1.R`
+  - `02_preprocessing-SiteCell-Dataset2.R`
+  - `03_preprocessing-SiteCell-Dataset3.R`
+
+- Public FDG datasets:
+  - `04_preprocessing-FDG1-GSE226896.R`
+  - `05_preprocessing-FDG2-GSE149689.R`
+  - `06_preprocessing-FDG3-GSE161918.R`
+  - `07_preprocessing-FDG4-GSE213516.R`
+  - `08_preprocessing-FDG5-GSE168732.R`
+
+  ### 2. Dataset integration
+
+All processed datasets are merged and integrated into a unified Seurat object.
+
+- `09_01-all-datasets-merge-and-integration.R`
+
+---
+
+### 3. Downstream analyses
+
+#### Cell quality and composition
+- `09_02-experiment-mitoRNAanalysis.R`
+- `09_03-experiment-cellproportion-calculation.R`
+
+#### Stress and functional analyses
+- `09_04-experiment-StressGenesAnalyses.R`
+- `09_05-experiment-subT-diversity.R`
+
+#### Replicates and validation
+- `10-experiment-FigS4-replicate-MX0049.R`
+
+#### Cross-dataset comparison
+- `11-experiment-comparison-SiteCELL-with-HIHA_dataset.R`
+
+#### Sample matching
+- `12_01-preprocessing-matching-samples-with-SiteCELL.R`
+- `12_02-preprocessing-matching-samples-with-FDG.R`
+
+#### Supplementary figures
+- `supplementary-fig2.R`
 
 ---
 
@@ -63,7 +87,7 @@ ENA Accession number: E-MTAB-15719
 
 If you use this code, please cite:
 
-Espinosa-Jaime, Aarón, et al. "SiteCELL enables on-site PBMCs purification and cryopreservation for immune single cell profiling of diverse ancestries." bioRxiv (2025): 2025-09. ** Accepted
+### Espinosa-Jaime, Aarón, et al. "SiteCELL enables on-site PBMCs purification and cryopreservation for immune single cell profiling of diverse ancestries." bioRxiv (2025): 2025-09. ** Accepted
 ---
 
 ## Author
