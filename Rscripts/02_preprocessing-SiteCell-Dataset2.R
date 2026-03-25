@@ -1,6 +1,6 @@
 
-####LatinCells2
-LC2<-Read10X("../Data/LatinCells/LC2/")
+####SiteCELL2
+LC2<-Read10X("../Data/SiteCELL/LC2/")
 LC2<-CreateSeuratObject(counts = LC2,min.cells = 3, min.features = 200)
 View(LC2@meta.data) ##17,571 
 
@@ -14,7 +14,7 @@ LC2$BARCODE<-rownames(LC2@meta.data)
 metadata_LC2<-LC2@meta.data
 
 #Import demux best-file
-demux1a<-read.table(file="../Data/LatinCells/best-files/LC2.best", header = T)
+demux1a<-read.table(file="../Data/SiteCELL/best-files/LC2.best", header = T)
 View(demux1a) ### 76,538
 
 demux1a.2 <- demux1a %>%
@@ -49,7 +49,7 @@ table(matching_rows.2$Patient)
 #112_LCMX0004 25_LC-CO-0025-ES  3_LC-CO-0003-ES      95_LCMX0147 
 #3992             3332             2567             6162
 
-freem1a<-read.table(file="../Data/LatinCells/freemux-files/LC2.clust1.samples.gz", header = T)
+freem1a<-read.table(file="../Data/SiteCELL/freemux-files/LC2.clust1.samples.gz", header = T)
 View(freem1a) ###17,590
 
 matching_barcodes<-merge(matching_rows.2, freem1a, by="BARCODE", all=TRUE)
@@ -185,10 +185,6 @@ int.LC2.ann<-RenameIdents(object=int.LC2.ann,"0"="NK","1"="B Naive","2"="CD4 TCM
 #Add idents
 int.LC2.ann$idents<-Idents(int.LC2.ann)
 
-saveRDS(int.LC2.ann, "res/int-LC2-ann.rds")
-
 #cell type counting
 counting.p1a<-table(int.LC2.ann$Patient, int.LC2.ann$predicted.celltype.l2)
 p1a.df<-as.data.frame(counting.p1a)
-
-fwrite(p1a.df, "res/dataframes-t-count/LC2-df.txt")
