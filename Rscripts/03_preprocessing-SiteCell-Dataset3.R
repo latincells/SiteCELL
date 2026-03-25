@@ -1,7 +1,7 @@
 
 
-#LatinCells3
-LC3<-Read10X(data.dir = "~/Data/LatinCells/LC3")
+#SiteCELL3
+LC3<-Read10X(data.dir = "~/Data/SiteCELL/LC3")
 LC3<-CreateSeuratObject(LC3, project = "LC3", min.cells = 3, min.features = 200)
 View(LC3@meta.data)
 
@@ -9,7 +9,7 @@ LC3$mitoPercent<- PercentageFeatureSet(LC3, pattern = "^MT-")
 LC3$BARCODE<-rownames(LC3@meta.data)
 metadata_LC3<-LC3@meta.data         #12923
 
-freemLC3<-read.table("~/Data/LatinCells/LC3/best-files/freemuxlet.clust1.samples.gz", header = T)
+freemLC3<-read.table("~/Data/SiteCELL/LC3/best-files/freemuxlet.clust1.samples.gz", header = T)
 table(freemLC3$DROPLET.TYPE)
 #AMB   DBL   SNG 
 #56   564 12362
@@ -93,11 +93,8 @@ int.LC3.j<-JoinLayers(int.LC3)
 int.LC3.ann<-RunAzimuth(int.LC3.j, reference = "pbmcref")
 View(int.LC3.ann@meta.data)
 
-#Generate RDS
-saveRDS(int.LC3.ann, file = "res/int-LC3-ann.rds")
 
 #Cell type counting
 counting.czi<-table(int.LC3.ann$Patient, int.LC3.ann$predicted.celltype.l2)
 czi.df<-as.data.frame(counting.czi)
 
-fwrite(czi.df, "res/dataframes-t-count/LC3-df.txt")
