@@ -21,22 +21,22 @@ library(Azimuth)
 #CLINICAL IMMUNOLOGICAL = immuno
 
 ###Donor1
-immunop1<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/uno/")
+immunop1<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/one/")
 immunop1<-CreateSeuratObject(counts = immunop1, project = "Immunophenotyping-1", min.cell = 3, min.features = 200)
 View(immunop1@meta.data)
 
 ###Donor2
-immunop2<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/dos/")
+immunop2<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/two/")
 immunop2<-CreateSeuratObject(counts = immunop2, project = "Immunophenotyping-2", min.cell = 3, min.features = 200)
 View(immunop2@meta.data)
 
 ###Donor3
-immunop3<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/tres/")
+immunop3<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/three/")
 immunop3<-CreateSeuratObject(counts = immunop3, project = "Immunophenotyping-3", min.cell = 3, min.features = 200)
 View(immunop3@meta.data)
 
 ###Donor4
-immunop4<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/cuatro/")
+immunop4<-Read10X("../Data/cxcr4-recruitment-lymphoid-cells/four/")
 immunop4<-CreateSeuratObject(counts = immunop4, project = "Immunophenotyping-4", min.cell = 3, min.features = 200)
 View(immunop4@meta.data)
 
@@ -128,10 +128,6 @@ int.immuno.ann@meta.data<-separate(int.immuno.ann@meta.data, col='Sample', into 
                                    sep='_')
 
 
-#Creacion y conteo de tipos celulares
+#Cell counting
 conteo.immuno<-table(int.immuno.ann$Patient, int.immuno.ann$predicted.celltype.l2)
 immuno.df<-as.data.frame(conteo.immuno)
-
-fwrite(immuno.df, "res/dataframes-t-count/immuno-df.txt")
-
-saveRDS(int.immuno.ann, "res/int-annotated-datasets/int-immuno-ann.rds")
