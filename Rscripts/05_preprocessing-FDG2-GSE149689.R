@@ -13,6 +13,7 @@ iphen$Sample<-rownames(iphen@meta.data)
 split_ids<-strsplit(iphen@meta.data$Sample, "-")
 donor_ids<-sapply(split_ids, function(x) x[2])
 iphen@meta.data$Sample<-donor_ids
+                  
 #CHange Sample for Patient
 colnames(iphen@meta.data)[5] <- "Patient"
 
@@ -97,6 +98,3 @@ int.iphen.ann$idents<-Idents(int.iphen.ann)
 #Cell type 
 counting.iphen<-table(int.iphen.ann$Patient, int.iphen.ann$predicted.celltype.l2)
 iphen.df<-as.data.frame(counting.iphen)
-
-fwrite(iphen.df, "res/dataframes-t-count/iphen-df.txt")
-saveRDS(int.iphen.ann, "res/int-iphen-ann.rds")
