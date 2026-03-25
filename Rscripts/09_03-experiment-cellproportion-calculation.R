@@ -1,7 +1,7 @@
 
 
 ##############UMAPS datasets integration (global) and cell type (idents) Figure 2
-int.all.objects<-readRDS("~/data/int.all.objects.rds")
+int.all.objects<-readRDS("~/data/int-all-objects.rds")
 
 umap1<-DimPlot(int.all.objects, reduction = "umap.cca", group.by = "Dataset",raster = FALSE,label = FALSE, alpha = 0.7)
 umap2<-DimPlot(int.all.objects, reduction = "umap.cca", group.by = "idents",raster = FALSE,label = FALSE, label.size = 2.5, alpha = 0.7)
@@ -9,8 +9,6 @@ umap1+umap2
 
 ggsave(filename = "~/data/Figures/umapglobaldatasets.jpg", plot = umap1, device = "jpg", width = 12, height = 7, dpi=600)
 ggsave(filename = "~/data/Figures/umapglobalidents.jpg", plot = umap2, device = "jpg", width = 12, height = 7, dpi=300)
-ggsave(filename = "~/data/Figures/umapglobaldatasets.svg", plot = umap1, device = "svg", width = 12, height = 7, dpi=600)
-ggsave(filename = "~/data/Figures/umapglobalidents.svg", plot = umap2, device = "svg", width = 12, height = 7, dpi=300)
 
 
 ###############################
@@ -18,7 +16,7 @@ ggsave(filename = "~/data/Figures/umapglobalidents.svg", plot = umap2, device = 
 
 #Modified table with cell proportions obtained by calculating celltype.prediction.i2 in integrated object metadata
 prop.table<-fread("~/data/proportiontable-integrated-object.txt")
-prop.table<-fread("~/tesis/Protocol/Data/dataframes-cellcount/tabla-combinada-rawtimeres.txt")
+prop.table<-fread("~/tabla-combinada-rawtimeres.txt")
 
 p.table <- prop.table %>%
   mutate(majorgroup = if_else(celltype %in% c("cDC1", "cDC2", "pDC"), "DC", majorgroup))
@@ -109,7 +107,6 @@ bcell<-ggplot(prop.table_3.b, aes(x = reorder(Dataset_ID, mean), y = mean, fill 
         legend.text = element_text(size = 6)
   ) 
 
-ggsave(filename = "~/data/Figures/Bcellproportion.svg", plot = bcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "~/data/Figures/Bcellproportion-2.jpg", plot = bcell, device = "jpg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 
 
@@ -142,8 +139,6 @@ nkcell<-ggplot(prop.table_3.n, aes(x = reorder(Dataset_ID, mean), y = mean, fill
         legend.text = element_text(size = 6)
   )
 
-
-ggsave(filename = "~/data/Figures/NKcellproportion.svg", plot = nkcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "~/data/Figures/NKcellproportion.jpg", plot = nkcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 
@@ -173,7 +168,6 @@ Monocell<-ggplot(prop.table_3.m, aes(x = reorder(Dataset_ID, mean), y = mean, fi
         axis.text = element_text(size = 6),              
         legend.text = element_text(size = 6))
 
-ggsave(filename = "Monocellproportion.svg", plot = Monocell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "Monocellproportion.jpg", plot = Monocell, device = "jpg",width = 8, height = 6,dpi=300)
 
 
@@ -203,7 +197,6 @@ dccell<-ggplot(prop.table_3.dc, aes(x = reorder(Dataset_ID, mean), y = mean, fil
         axis.text = element_text(size = 6),              
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/data/Figures/dc-cellproportion.svg", plot = dccell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "~/data/Figures/dc-cellproportion.jpg", plot = dccell, device = "jpg",width = 8, height = 6,dpi=300)
 
 
@@ -232,7 +225,6 @@ Tcell<-ggplot(prop.table_3.t, aes(x = reorder(Dataset_ID, mean), y = mean, fill 
         axis.text = element_text(size = 6),                
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/data/Figures/Tcellproportion.svg", plot = Tcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "~/data/Figures/Tcellproportion.jpg", plot = Tcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 ###########ERYTHROCYTE
@@ -265,7 +257,6 @@ erythcell<-ggplot(prop.table_3.e, aes(x = reorder(Dataset_ID, mean), y = mean, f
         axis.text = element_text(size = 6),              
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/data/Figures/Erythcellproportion.svg", plot = erythcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "~/data/Figures/Erythcellproportion.jpg", plot = erythcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 ##############3PLATELETS
@@ -298,7 +289,6 @@ plateletcell<-ggplot(prop.table_3.p.2, aes(x = reorder(Dataset_ID, mean), y = me
         axis.text = element_text(size = 6),                
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/data/Figures/Plateletcellproportion.svg", plot = plateletcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 ggsave(filename = "~/data/Figures/Plateletcellproportion.jpg", plot = plateletcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 
@@ -329,7 +319,6 @@ barplot2subtypet<-ggplot(prop.tablez, aes(x = group, y = percentage, fill = cell
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggsave(filename = "~/data/Figures/barplot2subtypet.jpg", plot = barplot2subtypet, device = "jpg", width = 12, height = 7, dpi=300)
-ggsave(filename = "~/data/Figures/barplot2subtypet.svg", plot = barplot2subtypet, device = "svg", width = 12, height = 7, dpi=300)
 
 
 
