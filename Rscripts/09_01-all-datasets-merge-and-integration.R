@@ -1,8 +1,8 @@
 #Import raw unprocessed Ficoll datasets
 
-setwd("~/tesis/Protocol/thesis")
+setwd("~/thesis")
 
-merged.tr<-readRDS("~/tesis/Protocol/thesis/time-resolving-raw/merge-tr.rds")
+merged.tr<-readRDS("~/time-resolving-raw/merge-tr.rds")
 
 merged.immuno<-readRDS("merged-immuno-raw.rds")
 merged.iphen<-readRDS("merged-iphen-raw.rds")
