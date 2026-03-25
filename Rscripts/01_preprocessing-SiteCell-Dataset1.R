@@ -1,7 +1,7 @@
-################################ LatinCells1 
+################################ SiteCELL1 
 
 #Importing data
-LC1<-Read10X("../Data/LatinCells/PBMC_1n2_Otomi/")
+LC1<-Read10X("../Data/SiteCELL/PBMC_1n2_Otomi/")
 LC1<-CreateSeuratObject(counts = LC1, min.cells = 3, min.features = 200)
 
 #Add column of mitochondrial rna
@@ -15,7 +15,7 @@ metadata_LC1<-LC1@meta.data
 View(metadata_LC1) #14144 barcodes
 
 #Import demux best-file
-demuxp1n2<-read.table(file="../Data/LatinCells/best-files/LC1.best", header = T)
+demuxp1n2<-read.table(file="../Data/SiteCELL/best-files/LC1.best", header = T)
 View(demuxp1n2) ###  71,461
 
 demuxp1n2.2 <- demuxp1n2 %>%
@@ -50,7 +50,7 @@ table(matching_rows.2$Patient)
 #90_LCMX0142 91_LCMX0143 92_LCMX0144 
 4012        5691          46
 
-freemp1n2<-read.table(file="../Data/LatinCells/freemux-files/LC1.clust1.samples.gz", header = T)
+freemp1n2<-read.table(file="../Data/SiteCELL/freemux-files/LC1.clust1.samples.gz", header = T)
 View(freemp1n2) ###17075
 
 matching_barcodes<-merge(matching_rows.2, freemp1n2, by="BARCODE", all=TRUE)
@@ -115,7 +115,7 @@ p1n2MX0142<-subset(LC1, subset = Patient == '90_LCMX0142')
 p1n2MX0143<-subset(LC1, subset = Patient == '91_LCMX0143')
 
 #Import individual 3 LC1
-p1n23MX0144<-Read10X("../Data/LatinCells/PBMC_3_Otomi/")
+p1n23MX0144<-Read10X("../Data/SiteCELL/PBMC_3_Otomi/")
 p1n23MX0144<-CreateSeuratObject(counts = p1n23MX0144, min.cells = 3, min.features = 200)
 
 #Add column of mitochondrial rna
@@ -188,12 +188,9 @@ int.LC1.ann<-RenameIdents(object=int.LC1.ann,"0"="CD14 Mono","1"="CD8 Effector 2
 
 int.LC1.ann$idents<-Idents(int.LC1.ann)
 
-#
-saveRDS(int.LC1.ann, "res/int-LC1-ann.rds")
-
 #Cell type counting
 conteo.LC1<-table(int.LC1.ann$Patient, int.LC1.ann$predicted.celltype.l2)
 LC1.df<-as.data.frame(conteo.LC1)
 
-fwrite(LC1.df, "res/dataframes-t-count/LC1-df.txt")
+
 
