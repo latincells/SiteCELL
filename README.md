@@ -7,9 +7,9 @@ is part of the LatinCells project which aims to map an immune atlas of indigenou
 ---
 ## Repository structure
 
-├── data/                # Main RDS object containing datasets
-├── scripts/             # Analysis scripts    
-└──  docs/                # Additional documentation  
+├── data/                
+├── scripts/             
+└── docs/    
 
 ---
 
@@ -87,7 +87,7 @@ ENA Accession number: E-MTAB-15719
 
 If you use this code, please cite:
 
-### Espinosa-Jaime, Aarón, et al. "SiteCELL enables on-site PBMCs purification and cryopreservation for immune single cell profiling of diverse ancestries." bioRxiv (2025): 2025-09. ** Accepted
+Espinosa-Jaime, Aarón, et al. "SiteCELL enables on-site PBMCs purification and cryopreservation for immune single cell profiling of diverse ancestries." bioRxiv (2025): 2025-09. ** Accepted
 ---
 
 ## Author
