@@ -25,8 +25,7 @@ Each dataset is processed independently, including quality control, filtering, a
 
 ### 2. Dataset integration
 
-All processed datasets are merged and integrated into a unified Seurat object.
-
+- Merged and integrated datasets 
   - `09_01-all-datasets-merge-and-integration.R`
 
 ### 3. Downstream analyses
