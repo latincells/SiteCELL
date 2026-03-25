@@ -3,14 +3,6 @@ This repository contains the analysis pipeline for comparing PBMC isolation prot
 The analysis focuses on cell composition, cell quality metrics, and transcriptomic stress signatures, particularly in samples from diverse ancestry backgrounds. This protocol
 is part of the LatinCells project which aims to map an immune atlas of indigenous and admixed Latin American populations.
 
-
----
-## Repository structure
-
-├── data/                
-├── scripts/             
-└── docs/    
-
 ---
 
 ## How to run
