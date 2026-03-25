@@ -91,5 +91,3 @@ int.aging.ann$idents<-Idents(int.aging.ann)
 conteo.aging<-table(int.aging.ann$Patient, int.aging.ann$predicted.celltype.l2)
 aging.df<-as.data.frame(conteo.aging)
 
-fwrite(aging.df, "res/dataframes-t-count/aging-df.txt")
-saveRDS(int.aging.ann, "res/int-annotated-datasets/int-aging-ann.rds")
