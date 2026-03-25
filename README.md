@@ -27,32 +27,32 @@ Each dataset is processed independently, including quality control, filtering, a
 
 All processed datasets are merged and integrated into a unified Seurat object.
 
-- `09_01-all-datasets-merge-and-integration.R`
+  - `09_01-all-datasets-merge-and-integration.R`
 
 ### 3. Downstream analyses
 
-#### Cell quality and composition
-- `09_02-experiment-mitoRNAanalysis.R`
-- `09_03-experiment-cellproportion-calculation.R`
+- Cell quality and composition
+  - `09_02-experiment-mitoRNAanalysis.R`
+  - `09_03-experiment-cellproportion-calculation.R`
 
-#### Stress and functional analyses
-- `09_04-experiment-StressGenesAnalyses.R`
-- `09_05-experiment-subT-diversity.R`
+- Stress and functional analyses
+  - `09_04-experiment-StressGenesAnalyses.R`
+  - `09_05-experiment-subT-diversity.R`
 
-#### Replicates and validation
-- `10-experiment-FigS4-replicate-MX0049.R`
+- Replicates and validation
+  - `10-experiment-FigS4-replicate-MX0049.R`
 
-#### Cross-dataset comparison
-- `11-experiment-comparison-SiteCELL-with-HIHA_dataset.R`
+- Cross-dataset comparison
+  - `11-experiment-comparison-SiteCELL-with-HIHA_dataset.R`
 
-#### Sample matching
-- `12_01-preprocessing-matching-samples-with-SiteCELL.R`
-- `12_02-preprocessing-matching-samples-with-FDG.R`
+- Sample matching
+  - `12_01-preprocessing-matching-samples-with-SiteCELL.R`
+  - `12_02-preprocessing-matching-samples-with-FDG.R`
 
-#### Supplementary figures
-- `supplementary-fig2.R`
+- Supplementary figures
+  - `supplementary-fig2.R`
 
----
+
 
 ## Methods summary
 
