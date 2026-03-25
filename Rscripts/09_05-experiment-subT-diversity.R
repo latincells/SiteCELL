@@ -31,14 +31,13 @@ dimplotsubt<-DimPlot(TSubset, reduction = "umap.cca", group.by = "idents", raste
 
 #Save figures
 ggsave(filename = "~/res/Figs/umapTsubtypes.jpg", plot = dimplotsubt, device = "jpg", width = 12, height = 7, dpi=300)
-ggsave(filename = "~/res/Figs/umapTsubtypes.svg", plot = dimplotsubt, device = "svg", width = 12, height = 7, dpi=300)
 
 
 ###########
 #Bar plot looking for differences in subtype proportions among isolation protocols
 
 #read object 
-int.all.objects<-readRDS("~/res/int-meta-object.rds")
+int.all.objects<-readRDS("~/int-meta-object.rds")
 #Creating metadata from t subset
 meta.int.t<-int.all.objects@meta.data
 
@@ -97,4 +96,3 @@ Tsubcelltbarplot<-ggplot(result_long, aes(x = reorder(Celltype,mean), y = mean, 
   theme_classic()+labs(x="T Subcelltype", y="Proportion (%)")
 
 ggsave(filename = "~/res/Figs/barplot2subtypet-diff.jpg", plot = Tsubcelltbarplot, device = "jpg", width = 12, height = 7, dpi=300)
-ggsave(filename = "~/res/Figs/barplot2subtypet-diff.svg", plot = Tsubcelltbarplot, device = "svg", width = 12, height = 7, dpi=300)
