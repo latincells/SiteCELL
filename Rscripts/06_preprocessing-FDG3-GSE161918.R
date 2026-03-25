@@ -388,7 +388,3 @@ tr.df<-as.data.frame(conteo.tr)
 
 conteo.tr.2<-table(int.tr$Patient, int.tr$predicted.celltype.l2)
 tr.df.2<-as.data.frame(conteo.tr.2)
-
-fwrite(tr.df.2, "res/dataframes-t-count/timeres-df-2.txt")
-
-saveRDS(int.tr.ann, "res/int-tr-ann.rds")
