@@ -5,9 +5,6 @@ in Espinosa-Jaime, Aaron, et al. "SiteCELL enables on-site PBMCs purification an
 [Zenodo DOI](https://doi.org/10.5281/zenodo.19224509)
 
   - Integrated Seurat object
-This "" file contains the full integrated dataset from both FDG and SiteCELL.
+This "int-meta-object.rds" file contains the full integrated dataset from both FDG and SiteCELL.
   [Zenodo DOI](https://doi.org/10.5281/zenodo.19224509)
 
-  - Merged Seurat object
-  This "" file contains the full merged dataset from both FDG and SiteCELL.
-  [Zenodo DOI](https://doi.org/10.5281/zenodo.19224509)
