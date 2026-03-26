@@ -19,11 +19,10 @@ library(pacman)
 library(sctransform)
 
 
-setwd("~/brazil-data/")
 
-##### B24.seu
+##### Library B24, PBMCS were isolated with FDG protocol. 
 
-B24.seu<-Read10X("~/filtered_feature_bc_matrix.h5")
+B24.seu<-Read10X("~/filtered_feature_bc_matrix/")
 B24.seu.seu<-CreateSeuratObject(counts = B24.seu, min.cells = 3, min.features = 200)
 
 #No crea las columnas de NCounts y nFeatures así que uso este código para forzar a que lo haga
