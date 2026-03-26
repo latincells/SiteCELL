@@ -8,62 +8,60 @@ library(ggplot2)
 library(ggridges)
 library(ggbeeswarm)
 
+
+######## Matching samples processed with FDG and SiteCELL
 ######################## MITOPERCENT FIGURE
 
-merged.brazil@meta.data<-merged.brazil@meta.data%>%
+merged.matched@meta.data<-merged.matched@meta.data%>%
   mutate(Dataset_ID="merged-B23")
 
 merged.B24.seu@meta.data<-merged.B24.seu@meta.data%>%
   mutate(Dataset_ID="merged-B24")
 
-merged.brazil<-merge(x = merged.brazil, y=merged.B24.seu)
+merged.matched<-merge(x = merged.matched, y=merged.B24.seu)
 
-saveRDS(merged.brazil, "~/brazil-data/RDSs/brazil-merged.rds")
-mtRNA.brazil<-readRDS("~/brazil-data/RDSs/brazil-merged.rds")
+saveRDS(merged.matched, "~/RDSs/brmatched-merged.rds")
+mtRNA.brmatched<-readRDS("~/brmatched-data/RDSs/brmatched-merged.rds")
 
 #Create a meta file from merged object
-meta.mtRNA.brazil<-mtRNA.brazil@meta.data
+meta.mtRNA.brmatched<-mtRNA.brmatched@meta.data
 
 #Collapse mitoPercent + percent.mito 
-meta.mtRNA.brazil$mtRNA.collapsed <- ifelse(is.na(meta.mtRNA.brazil$mitoPercent), meta.mtRNA.brazil$percent.mito, meta.mtRNA.brazil$mitoPercent)
+meta.mtRNA.brmatched$mtRNA.collapsed <- ifelse(is.na(meta.mtRNA.brmatched$mitoPercent), meta.mtRNA.brmatched$percent.mito, meta.mtRNA.brmatched$mitoPercent)
 
 #Save all merged metadata (for mtRNA analyses)
-fwrite(meta.mtRNA.brazil, "~/brazil-data/mtRNA-brazil.txt")
+fwrite(meta.mtRNA.brmatched, "~/brmatched-data/mtRNA-brmatched.txt")
 
 #Data wrangling
 
 #Add Patient column based on Dataset ID values
-meta.mtRNA.brazil<-meta.mtRNA.brazil%>%
+meta.mtRNA.brmatched<-meta.mtRNA.brmatched%>%
   mutate(Protocol_isolation = case_when(
-    Patient %in% c("LCBR0093", "LCBR0094", "LCBR0095", "LCBR0096") & Dataset_ID == "merged-B23" ~ "LatinCells",
+    Patient %in% c("LCBR0093", "LCBR0094", "LCBR0095", "LCBR0096") & Dataset_ID == "merged-B23" ~ "SiteCELL",
     Patient %in% c("LCBR0093", "LCBR0094", "LCBR0095", "LCBR0096") & Dataset_ID == "merged-B24" ~ "Ficoll",
     TRUE ~ "Sin clasificación"  # Por si hay algún valor fuera de los especificados
   ))
 
-colores.stress <- c('LatinCells' = '#1c9099',  
+colores.stress <- c('SiteCELL' = '#1c9099',  
                     'Ficoll' = '#a6bddb')
 
 
-meta.mtRNA.brazil$Dataset_ID <- factor(
-  meta.mtRNA.brazil$Dataset_ID,
+meta.mtRNA.brmatched$Dataset_ID <- factor(
+  meta.mtRNA.brmatched$Dataset_ID,
   levels = c("merged-B23", "merged-B24"),
-  labels = c("LatinCells", "Ficoll")
+  labels = c("SiteCELL", "Ficoll")
 )
 
-#Con líneas de tendencia
-# 1. Ordenar Dataset_IDs según Protocol_isolation (Ficoll primero)
-meta.mtRNA.brazil <- meta.mtRNA.brazil %>%
+#Order datasets
+meta.mtRNA.brmatched <- meta.mtRNA.brmatched %>%
   mutate(Dataset_ID = factor(Dataset_ID, levels = Dataset_ID[order(Protocol_isolation)]))
 
 
-br.mtplot<-ggplot(meta.mtRNA.brazil, aes(x = Protocol, y = mitoPercent, 
+br.mtplot<-ggplot(meta.mtRNA.brmatched, aes(x = Protocol, y = mitoPercent, 
                                       fill = Protocol_isolation, color = Protocol_isolation)) + 
-  #geom_jitter(position = position_jitter(width = 0.25), size = 0.8, alpha = 0.8) +
-  #geom_violin(width = 0.3, size = 0.7, col = "black", alpha = 0.9) +
   geom_violin(width = 0.7, color = NA, alpha = 0.9) +
   stat_summary(aes(group = Dataset_ID), fun = "mean", geom = "point", shape = 20,
                size = 1, fill = "white", color = "black", stroke = 1.2) +
-  #geom_hline(yintercept = mean(meta.mtRNA.brazil$mitoPercent, na.rm = TRUE), linetype = "dashed", color = "black", alpha=0.7) +
   scale_fill_manual(values = colores.stress) +
   scale_color_manual(values = colores.stress) +
   theme_classic(base_size = 14) +
@@ -87,31 +85,28 @@ br.mtplot<-ggplot(meta.mtRNA.brazil, aes(x = Protocol, y = mitoPercent,
   )
 
 ggsave(filename = "figs/mtRNA.jpg", plot = br.mtplot, device = "jpg", width = 12, height = 9.5, dpi=600)
-ggsave(filename = "figs/mtRNA.svg", plot = br.mtplot, device = "svg", width = 12, height = 9.5, dpi=600)
 
 
 ##################UMIS and GENES per 
 
-colores.stress <- c('LatinCells' = '#1c9099',  
+colores.stress <- c('SiteCELL' = '#1c9099',  
                     'Ficoll' = '#a6bddb')
 
 
 # Ncount
-meta.mtRNA.brazil$Protocol <- ifelse(grepl("Ficoll", meta.mtRNA.brazil$Group), "Ficoll", "LatinCells")
+meta.mtRNA.brmatched$Protocol <- ifelse(grepl("Ficoll", meta.mtRNA.brmatched$Group), "Ficoll", "SiteCELL")
 
 
-meta.mtRNA.brazil <- meta.mtRNA.brazil %>%
+meta.mtRNA.brmatched <- meta.mtRNA.brmatched %>%
   arrange(Protocol, Group) %>%
   mutate(Group = factor(Group, levels = unique(Group)))
 
 
-# Graficar
-ncount.br<-ggplot(meta.mtRNA.brazil, aes(x = Group, y = nCount_RNA, fill = Protocol_isolation)) + 
-  #geom_jitter(shape = 21,    size = 0.9,    alpha = 0.5,    stroke = 0.3,    position = position_jitter(width = 0.15))+
+# 
+ncount.br<-ggplot(meta.mtRNA.brmatched, aes(x = Group, y = nCount_RNA, fill = Protocol_isolation)) + 
   geom_violin(width = 0.7, color = NA, alpha = 0.9) +
-  scale_fill_manual(values = c('LatinCells' = '#1c9099', 'Ficoll' = '#a6bddb')) +
+  scale_fill_manual(values = c('SiteCELL' = '#1c9099', 'Ficoll' = '#a6bddb')) +
   stat_summary(fun = mean, geom = "point", shape = 21, size = 2, color = "black", fill = "black") +
-  #geom_hline(yintercept = mean(meta.mtRNA.brazil$nCount_RNA, na.rm = TRUE), linetype = "dashed", color = "black", alpha=0.7) +
   scale_x_discrete(labels = function(x) gsub("_.*", "", x)) + 
   scale_y_log10(breaks=c(1000,10000,25000,100000), labels=scales::comma)+
   theme_classic(base_size = 14) +
@@ -119,14 +114,12 @@ ncount.br<-ggplot(meta.mtRNA.brazil, aes(x = Group, y = nCount_RNA, fill = Proto
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ggsave(filename = "figs/ncount-br.jpg", plot = ncount.br, device = "jpg", width = 12, height = 9.5, dpi=600)
-ggsave(filename = "figs/ncount-br.svg", plot = ncount.br, device = "svg", width = 12, height = 9.5, dpi=600)
 
 
 #NFeatures
-nfeatu.br<-ggplot(meta.mtRNA.brazil, aes(x = Group, y = nFeature_RNA, fill = Protocol_isolation)) + 
-  #geom_jitter(shape = 21,size = 0.9, alpha = 0.5,stroke = 0.3, position = position_jitter(width = 0.15)) +
+nfeatu.br<-ggplot(meta.mtRNA.brmatched, aes(x = Group, y = nFeature_RNA, fill = Protocol_isolation)) + 
   geom_violin(width = 0.7, color = NA, alpha = 0.9) +
-  scale_fill_manual(values = c('LatinCells' = '#1c9099', 'Ficoll' = '#a6bddb')) +
+  scale_fill_manual(values = c('SiteCELL' = '#1c9099', 'Ficoll' = '#a6bddb')) +
   stat_summary(fun = mean, geom = "point", shape = 21, size = 2, color = "black", fill = "black") +
   scale_x_discrete(labels = function(x) gsub("_.*", "", x)) +
   scale_y_log10(breaks=c(1000,5000,10000), labels=scales::comma) +
@@ -138,72 +131,69 @@ nfeatu.br<-ggplot(meta.mtRNA.brazil, aes(x = Group, y = nFeature_RNA, fill = Pro
 
 
 ggsave(filename = "figs/nfeature-br.jpg", plot = nfeatu.br, device = "jpg", width = 12, height = 9.5, dpi=600)
-ggsave(filename = "figs/nfeature-br.svg", plot = nfeatu.br, device = "svg", width = 12, height = 9.5, dpi=600)
 
 ############################### STRESS GENE FIGURE
 
 #Add Patient column based on Dataset ID values
-merged.brazil@meta.data<-merged.brazil@meta.data%>%
+merged.matched@meta.data<-merged.matched@meta.data%>%
   mutate(Protocol_isolation = case_when(
-    Patient %in% c("LCBR0093", "LCBR0094", "LCBR0095", "LCBR0096") & Dataset_ID == "merged-B23" ~ "LatinCells",
+    Patient %in% c("LCBR0093", "LCBR0094", "LCBR0095", "LCBR0096") & Dataset_ID == "merged-B23" ~ "SiteCELL",
     Patient %in% c("LCBR0093", "LCBR0094", "LCBR0095", "LCBR0096") & Dataset_ID == "merged-B24" ~ "Ficoll",
-    TRUE ~ "Sin clasificación"  # Por si hay algún valor fuera de los especificados
+    TRUE ~ "NONE"  
   ))
 
-merged.brazil<-NormalizeData(merged.brazil)
-merged.brazil<-FindVariableFeatures(merged.brazil, selection.method = "vst", nfeatures = 3000)
-merged.brazil<-ScaleData(merged.brazil)
-merged.brazil<-RunPCA(merged.brazil)
-#ElbowPlot(merged.brazil, ndims = 50)
-merged.brazil<-FindNeighbors(merged.brazil, dims=1:35)
-merged.brazil<-FindClusters(merged.brazil, resolution = 1) 
-merged.brazil<-RunUMAP(merged.brazil, dims=1:35, return.model = T)
+merged.matched<-NormalizeData(merged.matched)
+merged.matched<-FindVariableFeatures(merged.matched, selection.method = "vst", nfeatures = 3000)
+merged.matched<-ScaleData(merged.matched)
+merged.matched<-RunPCA(merged.matched)
+#ElbowPlot(merged.matched, ndims = 50)
+merged.matched<-FindNeighbors(merged.matched, dims=1:35)
+merged.matched<-FindClusters(merged.matched, resolution = 1) 
+merged.matched<-RunUMAP(merged.matched, dims=1:35, return.model = T)
 
-DimPlot(merged.brazil, label=T, reduction = "umap", group.by = c("Protocol_isolation","seurat_clusters"))
+DimPlot(merged.matched, label=T, reduction = "umap", group.by = c("Protocol_isolation","seurat_clusters"))
 
 
-int.mbrasil<-IntegrateLayers(merged.brazil, method = CCAIntegration, 
+int.mbrmatched<-IntegrateLayers(merged.matched, method = CCAIntegration, 
                          orig.reduction = "pca", new.reduction="integrated.cca",
                          verbose=FALSE)
 
-int.mbrasil<-FindNeighbors(int.mbrasil, reduction = "integrated.cca", dims=1:30)
-int.mbrasil<-FindClusters(int.mbrasil, resolution = 1)
+int.mbrmatched<-FindNeighbors(int.mbrmatched, reduction = "integrated.cca", dims=1:30)
+int.mbrmatched<-FindClusters(int.mbrmatched, resolution = 1)
 
-int.mbrasil<-RunUMAP(int.mbrasil, reduction = "integrated.cca", dims = 1:30, reduction.name = "umap.cca")
+int.mbrmatched<-RunUMAP(int.mbrmatched, reduction = "integrated.cca", dims = 1:30, reduction.name = "umap.cca")
 
-DimPlot(int.mbrasil.ann, reduction = "umap.cca", group.by=c("seurat_clusters"),alpha = 0.5, pt.size = 1.2, label=TRUE)
+DimPlot(int.mbrmatched.ann, reduction = "umap.cca", group.by=c("seurat_clusters"),alpha = 0.5, pt.size = 1.2, label=TRUE)
 
-int.mbrasil.j<-JoinLayers(int.mbrasil)
+int.mbrmatched.j<-JoinLayers(int.mbrmatched)
 
-int.mbrasil.ann<-RunAzimuth(int.mbrasil.j, reference="pbmcref")
-DimPlot(int.mbrasil.ann, reduction = "umap.cca", group.by=c("seurat_clusters", "predicted.celltype.l2"),alpha = 0.5, pt.size = 1.2, label=TRUE)
+int.mbrmatched.ann<-RunAzimuth(int.mbrmatched.j, reference="pbmcref")
+DimPlot(int.mbrmatched.ann, reduction = "umap.cca", group.by=c("seurat_clusters", "predicted.celltype.l2"),alpha = 0.5, pt.size = 1.2, label=TRUE)
 
-umaps.by.protocol<-DimPlot(int.mbrasil.ann, reduction = "umap.cca",group.by = "predicted.celltype.l2", split.by="Protocol_isolation",alpha = 0.5, pt.size = 1.2, label=FALSE)
-ggsave(filename = "~/brazil-data/figs/umaps-both-protocol-br.jpg", plot = umaps.by.protocol, device = "jpg",width = 12, height = 8, dpi = 600)
-ggsave(filename = "~/brazil-data/figs/umaps-both-protocol-br.svg", plot = umaps.by.protocol, device = "svg",width = 12, height = 8, dpi = 600)
-ggsave(filename = "~/brazil-data/figs/umaps-both-protocol-br.pdf", plot = umaps.by.protocol, device = "pdf",width = 12, height = 8, dpi = 600)
+umaps.by.protocol<-DimPlot(int.mbrmatched.ann, reduction = "umap.cca",group.by = "predicted.celltype.l2", split.by="Protocol_isolation",alpha = 0.5, pt.size = 1.2, label=FALSE)
+ggsave(filename = "~/brmatched-data/figs/umaps-both-protocol-br.jpg", plot = umaps.by.protocol, device = "jpg",width = 12, height = 8, dpi = 600)
 
 
-brasil.latincells<-subset(int.mbrasil.ann, subset = Protocol_isolation =="LatinCells")
-brasil.latincells<-FindNeighbors(brasil.latincells,reduction = "integrated.cca", dims = 1:30)
-brasil.latincells<-FindClusters(brasil.latincells, resolution = 1)
-brasil.latincells<-RunUMAP(brasil.latincells, reduction = "integrated.cca", dims=1:30, reduction.name="umap.cca")
+brmatched.SiteCELL<-subset(int.mbrmatched.ann, subset = Protocol_isolation =="SiteCELL")
+brmatched.SiteCELL<-FindNeighbors(brmatched.SiteCELL,reduction = "integrated.cca", dims = 1:30)
+brmatched.SiteCELL<-FindClusters(brmatched.SiteCELL, resolution = 1)
+brmatched.SiteCELL<-RunUMAP(brmatched.SiteCELL, reduction = "integrated.cca", dims=1:30, reduction.name="umap.cca")
 
-brasil.ficoll<-subset(int.mbrasil.ann, subset = Protocol_isolation =="Ficoll")
-brasil.ficoll<-FindNeighbors(brasil.ficoll,reduction = "integrated.cca", dims = 1:30)
-brasil.ficoll<-FindClusters(brasil.ficoll, resolution = 1)
-brasil.ficoll<-RunUMAP(brasil.ficoll, reduction = "integrated.cca", dims=1:30, reduction.name="umap.cca")
+brmatched.ficoll<-subset(int.mbrmatched.ann, subset = Protocol_isolation =="Ficoll")
+brmatched.ficoll<-FindNeighbors(brmatched.ficoll,reduction = "integrated.cca", dims = 1:30)
+brmatched.ficoll<-FindClusters(brmatched.ficoll, resolution = 1)
+brmatched.ficoll<-RunUMAP(brmatched.ficoll, reduction = "integrated.cca", dims=1:30, reduction.name="umap.cca")
 
 
-umap.br.lc<-DimPlot(brasil.latincells, reduction = "umap.cca", group.by="predicted.celltype.l2",alpha = 0.5, pt.size = 1.2, label=TRUE)+NoLegend()
-ggsave(filename = "~/brazil-data/figs/umap-br-lc.jpg", plot = umap.br.lc, device = "jpg",width = 12, height = 8, dpi = 600)
+umap.br.lc<-DimPlot(brmatched.SiteCELL, reduction = "umap.cca", group.by="predicted.celltype.l2",alpha = 0.5, pt.size = 1.2, label=TRUE)+NoLegend()
+ggsave(filename = "~/brmatched-data/figs/umap-br-lc.jpg", plot = umap.br.lc, device = "jpg",width = 12, height = 8, dpi = 600)
 
-umap.br.fic<-DimPlot(brasil.ficoll, reduction = "umap.cca", group.by="predicted.celltype.l2",alpha = 0.5, pt.size = 1.2, label=TRUE)
-ggsave(filename = "~/brazil-data/figs/umap-br-fic.jpg", plot = umap.br.fic, device = "jpg",width = 12, height = 8, dpi = 600)
+umap.br.fic<-DimPlot(brmatched.ficoll, reduction = "umap.cca", group.by="predicted.celltype.l2",alpha = 0.5, pt.size = 1.2, label=TRUE)
+ggsave(filename = "~/brmatched-data/figs/umap-br-fic.jpg", plot = umap.br.fic, device = "jpg",width = 12, height = 8, dpi = 600)
 
 #Adding extra Majorgroup celltype
 
-int.mbrasil.ann@meta.data<-int.mbrasil.ann@meta.data%>%
+int.mbrmatched.ann@meta.data<-int.mbrmatched.ann@meta.data%>%
   mutate(MajorGroup = case_when(
     predicted.celltype.l2 %in% c("CD8 TEM", "CD4 Naive",
                   "CD8 TCM","CD4 TCM",
@@ -225,15 +215,15 @@ int.mbrasil.ann@meta.data<-int.mbrasil.ann@meta.data%>%
   ))
 
 ###AGGREGATE EXPRESSION
-pb.brasil<-AggregateExpression(int.mbrasil.ann, return.seurat = T,
+pb.brmatched<-AggregateExpression(int.mbrmatched.ann, return.seurat = T,
                                     assays = "RNA",
                                     group.by = c("predicted.celltype.l2","Patient", "Protocol_isolation"))
 
 #Getting matrix
-matrix.brasil<-as.matrix(GetAssayData(pb.brasil, layer = 'data')[, WhichCells(pb.brasil)])
+matrix.brmatched<-as.matrix(GetAssayData(pb.brmatched, layer = 'data')[, WhichCells(pb.brmatched)])
 
 #Write objects
-fwrite(matrix.brasil, "~/brazil-data/brasil-aggregatecounts.txt", row.names = TRUE, col.names = TRUE)
+fwrite(matrix.brmatched, "~/brmatched-data/brmatched-aggregatecounts.txt", row.names = TRUE, col.names = TRUE)
 
 #Read gene vestors
 #Genes from Massoni-Badossa et al.
@@ -245,13 +235,7 @@ features.time <- c("H3F3B",  "NEAT1", "SRGN", "SERF2","CFL1","MYL12A",
                    "KLF6","SAT1","GIMAP7")
 
 #Read object
-aggregatecounts<-read.csv("~/brazil-data/brasil-aggregatecounts.txt", header = TRUE)
-
-#IF getwd()
-#"/data/users/aaron/tesis/Protocol/thesis"
-
-#aggregatecounts<-read.table("pseudobulk_partial.tsv", sep = "\t", header=TRUE)
-#View(aggregatecounts)
+aggregatecounts<-read.csv("~/brmatched-data/brmatched-aggregatecounts.txt", header = TRUE)
 
 # Exclude the 'column1' column
 colnames_split <- strsplit(colnames(aggregatecounts)[-1], "_")  
@@ -306,7 +290,7 @@ df_long.stress<-df_long.stress%>%
   mutate(Isolation = case_when(
     Sample %in% c("LCBR0093.Ficoll", "LCBR0094.Ficoll",
                   "LCBR0095.Ficoll","LCBR0096.Ficoll") ~  "Ficoll",
-    Sample %in% c("LCBR0093.LC","LCBR0094.LC","LCBR0095.LC","LCBR0096.LC")~  "LatinCells",
+    Sample %in% c("LCBR0093.LC","LCBR0094.LC","LCBR0095.LC","LCBR0096.LC")~  "SiteCELL",
     TRUE ~ "NA"  
   ))
 
@@ -319,7 +303,7 @@ df_long.time<-df_long.time%>%
   mutate(Isolation = case_when(
     Sample %in% c("LCBR0093.Ficoll", "LCBR0094.Ficoll",
                   "LCBR0095.Ficoll","LCBR0096.Ficoll") ~  "Ficoll",
-    Sample %in% c("LCBR0093.LC","LCBR0094.LC","LCBR0095.LC","LCBR0096.LC")~  "LatinCells",
+    Sample %in% c("LCBR0093.LC","LCBR0094.LC","LCBR0095.LC","LCBR0096.LC")~  "SiteCELL",
     TRUE ~ "NA"  
   ))
 
@@ -341,7 +325,7 @@ df_long.time2.1<-df_long.time2.1%>%
   mutate(Isolation=reorder(Isolation, sumexp_stress, FUN=mean))
 
 
-colores.stress <- c('LatinCells' = '#1c9099',  
+colores.stress <- c('SiteCELL' = '#1c9099',  
                     'Ficoll' = '#a6bddb')
 
 
@@ -358,9 +342,9 @@ stressg<-ggplot(df_long.stress2.1, aes(x = Isolation, y = sumexp_stress, fill = 
   theme(
   )
 
-ggsave(filename = "~/brazil-data/figs/stress-processing.svg", plot = stressg, device = "svg",width = 12, height = 8, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/stress-processing.jpg", plot = stressg, device = "jpg",width = 12, height = 8, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/stress-processing.pdf", plot = stressg, device = "pdf",width = 12, height = 8, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/stress-processing.svg", plot = stressg, device = "svg",width = 12, height = 8, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/stress-processing.jpg", plot = stressg, device = "jpg",width = 12, height = 8, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/stress-processing.pdf", plot = stressg, device = "pdf",width = 12, height = 8, dpi = 300)
 
 stress.time<-ggplot(df_long.time2.1, aes(x = Isolation, y = sumexp_stress, fill = Isolation, color=Isolation)) +
   geom_boxplot(outlier.shape = NA, alpha = 0.9, width = 0.6, size = 0.8) +  
@@ -374,30 +358,28 @@ stress.time<-ggplot(df_long.time2.1, aes(x = Isolation, y = sumexp_stress, fill 
   theme(
   )
 
-ggsave(filename = "~/brazil-data/figs/stress-time.svg", plot = stress.time, device = "svg",width = 12, height = 8, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/stress-time.jpg", plot = stress.time, device = "jpg",width = 12, height = 8, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/stress-time.jpg", plot = stress.time, device = "jpg",width = 12, height = 8, dpi = 300)
 
 #Heat map
 #HEATMAP
 
 #From META OBJECT matrix
-aggregatecounts<-read.csv("~/brazil-data/brasil-aggregatecounts.txt", header = TRUE)
+aggregatecounts<-read.csv("~/brmatched-data/brmatched-aggregatecounts.txt", header = TRUE)
 
 
 # Extract expression matrix
-matrix.brasil<-as.matrix(pb.brasil[["RNA"]]@layers$data)
+matrix.brmatched<-as.matrix(pb.brmatched[["RNA"]]@layers$data)
 
 #Normalize expression values between 0 and 1
 
 
 #Crossing feature.immune against matrix
-matriz_filtrada <- pb.brasil[rownames(pb.brasil) %in% features.stress, ]
+matriz_filtrada <- pb.brmatched[rownames(pb.brmatched) %in% features.stress, ]
 
 
-log_mat.brasil<-apply(log1p(matriz_filtrada), 2, function(x) {
+log_mat.brmatched<-apply(log1p(matriz_filtrada), 2, function(x) {
   (x - min(x)) / (max(x) - min(x))
 })
-
 
 
 #matrix wrangling
@@ -408,7 +390,7 @@ matriz_filtrada2 <- as.data.frame(matriz_normalizada)%>%
   mutate(CellType = sub("_LC*","",Sample),
          Treatment=case_when(
            grepl("Ficoll", Sample)~ "Ficoll",
-           grepl("LatinCells",Sample)~"LatinCells"
+           grepl("SiteCELL",Sample)~"SiteCELL"
          ))
 
 matriz_filtrada2.1 <- matriz_filtrada2 %>%
@@ -443,7 +425,7 @@ df_ficoll<-df%>%
 
 
 df_lc<-df%>%
-  filter(Treatment=="LatinCells")%>%
+  filter(Treatment=="SiteCELL")%>%
   filter(MajorGroup != "HSPC")
   
 
@@ -451,7 +433,7 @@ df_lc<-df%>%
 palette_colors<-c("#762A83FF","white", "#FFA500") #darkviolet","#301E48FF","#F7AA14FF")
 
 #Heatmap Plot
-heatmap.bra.fic<-ggplot(df_ficoll, aes(x = Sample_CellType, y = Gene, fill = Expression)) +
+heatmap.br.fic<-ggplot(df_ficoll, aes(x = Sample_CellType, y = Gene, fill = Expression)) +
   geom_tile(color = "white", linewidth = 0.5) +  
   scale_fill_gradientn(
     colors=palette_colors)+
@@ -468,12 +450,11 @@ heatmap.bra.fic<-ggplot(df_ficoll, aes(x = Sample_CellType, y = Gene, fill = Exp
   ) +
   scale_x_discrete(labels = function(x) gsub("_", "\n", x))  
 
-ggsave(filename = "~/brazil-data/figs/heatmap-ficoll.svg", plot = heatmap.bra.fic, device = "svg",width = 12, height = 8, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/heatmap-ficoll.jpg", plot = heatmap.bra.fic, device = "jpg",width = 12, height = 8, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/heatmap-ficoll.jpg", plot = heatmap.br.fic, device = "jpg",width = 12, height = 8, dpi = 300)
 
 
 
-heatmap.bra.lc<-ggplot(df_lc, aes(x = Sample_CellType, y = Gene, fill = Expression)) +
+heatmap.br.lc<-ggplot(df_lc, aes(x = Sample_CellType, y = Gene, fill = Expression)) +
   geom_tile(color = "white", linewidth = 0.5) +  
   scale_fill_gradientn(
     colors=palette_colors,
@@ -492,8 +473,7 @@ heatmap.bra.lc<-ggplot(df_lc, aes(x = Sample_CellType, y = Gene, fill = Expressi
   ) +
   scale_x_discrete(labels = function(x) gsub("_", "\n", x))
 
-ggsave(filename = "~/brazil-data/figs/heatmap-lc.svg", plot = heatmap.bra.lc, device = "svg",width = 12, height = 8, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/heatmap-lc.jpg", plot = heatmap.bra.lc, device = "jpg",width = 12, height = 8, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/heatmap-lc.jpg", plot = heatmap.br.lc, device = "jpg",width = 12, height = 8, dpi = 300)
 
 ######Proportion calculation
 b23.93<-subset(int.B23.ann, subset = Patient == "LCBR0093")
@@ -545,7 +525,7 @@ df_summary<-df_summary%>%
 df_summary<-df_summary%>%
   mutate(Treatment = case_when(
     Sample %in% c("b23.93", "b23.94",
-                  "b23.95","b23.96") ~  "LatinCells",
+                  "b23.95","b23.96") ~  "SiteCELL",
     Sample %in% c("b24.93", "b24.94",
                   "b24.95","b24.96")~  "Ficoll",
     TRUE ~ "NOCLASS"
@@ -568,9 +548,9 @@ df_summary_subtype <- df_summary %>%
 df_summary_subtype <- df_summary_subtype %>%
   mutate(Treatment = recode(Treatment,
                             "Ficoll"     = "FDG",
-                            "LatinCells" = "SiteCELL"))
+                            "SiteCELL" = "SiteCELL"))
 
-#plot subtypes in brazil experiment
+#plot subtypes in brmatched experiment
 br.subtype.prop<-ggplot(df_summary_subtype, aes(x = reorder(CellType,mean_prop), y = mean_prop, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   theme_classic() +
@@ -613,12 +593,11 @@ br.subtype.prop<-ggplot(df_summary_subtype, aes(x = reorder(CellType,mean_prop),
     )
   )
 
-ggsave(filename = "~/brazil-data/figs/pbmc-subtype-br.svg", plot = br.subtype.prop, device = "svg",width = 8, height = 6, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/pbmc-subtype-br.jpg", plot = br.subtype.prop, device = "jpg",width = 8, height = 6, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/pbmc-subtype-br.pdf", plot = br.subtype.prop, device = cairo_pdf,width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/pbmc-subtype-br.jpg", plot = br.subtype.prop, device = "jpg",width = 8, height = 6, dpi = 300)
 
 
-fwrite(df_summary, "counts-brasil.txt")
+
+fwrite(df_summary, "counts-brmatched.txt")
 
 #calculate counts and percentages for majorgroup
 counts.bra<-df_summary %>%
@@ -627,7 +606,7 @@ counts.bra<-df_summary %>%
             perc_mg=sum(Proportion))
 
 #Calculate mean sd, se, var
-counts.bra.filt<-counts.bra%>%
+counts.br.filt<-counts.bra%>%
   group_by(Treatment, MajorGroup)%>%
   summarise(Mean_perc_mg=mean(perc_mg, na.rm = TRUE),
             SD_perc_mg=sd(perc_mg, na.rm = TRUE),
@@ -636,42 +615,42 @@ counts.bra.filt<-counts.bra%>%
             .groups="drop")
 
 
-#Add eryth and platelet column for latincells
-counts.bra.filt1<-counts.bra.filt%>%
+#Add eryth and platelet column for SiteCELL
+counts.br.filt1<-counts.br.filt%>%
   bind_rows(
     tibble(
       MajorGroup="Eryth",
-      Treatment="LatinCells",
+      Treatment="SiteCELL",
       Mean_perc_mg=0,
       SD_perc_mg=0,
       Var_perc_mg=0,
       SE_perc_mg=0))
 
-counts.bra.filt1<-counts.bra.filt1%>%
+counts.br.filt1<-counts.br.filt1%>%
   bind_rows(
     tibble(
       MajorGroup="Platelet",
-      Treatment="LatinCells",
+      Treatment="SiteCELL",
       Mean_perc_mg=0,
       SD_perc_mg=0,
       Var_perc_mg=0,
       SE_perc_mg=0))
 
 #filter out HSCP
-counts.bra.filt1<-counts.bra.filt1%>%
+counts.br.filt1<-counts.br.filt1%>%
   filter(MajorGroup != "HSPC")
 
 
 ###BARPLOTS
-colores <- c('LatinCells' = '#1c9099',  
+colores <- c('SiteCELL' = '#1c9099',  
              'Ficoll' = '#a6bddb')
 
-counts.bra.filt1.b<-counts.bra.filt1 %>%
+counts.br.filt1.b<-counts.br.filt1 %>%
   filter(MajorGroup=="B")
 
-b.overallmean<-mean(counts.bra.filt1.b$Mean_perc_mg, na.mr=TRUE)
+b.overallmean<-mean(counts.br.filt1.b$Mean_perc_mg, na.mr=TRUE)
 
-bcell<-ggplot(counts.bra.filt1.b, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
+bcell<-ggplot(counts.br.filt1.b, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
   geom_bar(stat="identity",position="dodge") +
   #geom_point(aes(MajorGroup),size=2.2)+
   geom_errorbar(aes(ymin=Mean_perc_mg, ymax=Mean_perc_mg+SD_perc_mg), width=.2,
@@ -691,19 +670,19 @@ bcell<-ggplot(counts.bra.filt1.b, aes(x = reorder(Treatment, Mean_perc_mg), y = 
         legend.text = element_text(size = 6)
   ) 
 
-ggsave(filename = "~/brazil-data/figs/Bcellproportion.svg", plot = bcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
-ggsave(filename = "~/brazil-data/figs/Bcellproportion-2.jpg", plot = bcell, device = "jpg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
+ggsave(filename = "~/brmatched-data/figs/Bcellproportion.svg", plot = bcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
+ggsave(filename = "~/brmatched-data/figs/Bcellproportion-2.jpg", plot = bcell, device = "jpg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
 
 
 
 ######NK CELL
 
-counts.bra.filt1.n<-counts.bra.filt1 %>%
+counts.br.filt1.n<-counts.br.filt1 %>%
   filter(MajorGroup=="NK")
 
-n.overallmean<-mean(counts.bra.filt1.n$Mean_perc_mg, na.mr=TRUE)
+n.overallmean<-mean(counts.br.filt1.n$Mean_perc_mg, na.mr=TRUE)
 
-nkcell<-ggplot(counts.bra.filt1.n, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
+nkcell<-ggplot(counts.br.filt1.n, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
   geom_bar(stat="identity",position="dodge") +
   #geom_point(aes(MajorGroup),size=2.2)+
   coord_flip()+
@@ -725,18 +704,17 @@ nkcell<-ggplot(counts.bra.filt1.n, aes(x = reorder(Treatment, Mean_perc_mg), y =
   )
 
 
-ggsave(filename = "~/brazil-data/figs/NKcellproportion.svg", plot = nkcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
-ggsave(filename = "~/brazil-data/figs/NKcellproportion.jpg", plot = nkcell, device = "jpg",width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/NKcellproportion.jpg", plot = nkcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 
 #####MONOCYTE
-counts.bra.filt1.m<-counts.bra.filt1 %>%
+counts.br.filt1.m<-counts.br.filt1 %>%
   filter(MajorGroup=="Monocyte")
 
-m.overallmean<-mean(counts.bra.filt1.m$Mean_perc_mg, na.mr=TRUE)  
+m.overallmean<-mean(counts.br.filt1.m$Mean_perc_mg, na.mr=TRUE)  
 
 
-Monocell<-ggplot(counts.bra.filt1.m, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
+Monocell<-ggplot(counts.br.filt1.m, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
   geom_bar(stat="identity",position="dodge") +
   coord_flip()+
   #geom_point(aes(MajorGroup),size=2.2)+
@@ -755,17 +733,16 @@ Monocell<-ggplot(counts.bra.filt1.m, aes(x = reorder(Treatment, Mean_perc_mg), y
         axis.text = element_text(size = 6),              
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/brazil-data/figs/Monocellproportion.svg", plot = Monocell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
-ggsave(filename = "~/brazil-data/figs/Monocellproportion.jpg", plot = Monocell, device = "jpg",width = 8, height = 6,dpi=300)
+ggsave(filename = "~/brmatched-data/figs/Monocellproportion.jpg", plot = Monocell, device = "jpg",width = 8, height = 6,dpi=300)
 
 
 ############T CELL
-counts.bra.filt1.t<-counts.bra.filt1 %>%
+counts.br.filt1.t<-counts.br.filt1 %>%
   filter(MajorGroup=="T")
 
-t.overallmean<-mean(counts.bra.filt1.t$Mean_perc_mg, na.mr=TRUE)
+t.overallmean<-mean(counts.br.filt1.t$Mean_perc_mg, na.mr=TRUE)
 
-Tcell<-ggplot(counts.bra.filt1.t, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
+Tcell<-ggplot(counts.br.filt1.t, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
   geom_bar(stat="identity",position="dodge") +
   coord_flip()+
   #geom_point(aes(MajorGroup),size=2.2)+
@@ -784,23 +761,21 @@ Tcell<-ggplot(counts.bra.filt1.t, aes(x = reorder(Treatment, Mean_perc_mg), y = 
         axis.text = element_text(size = 6),                
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/brazil-data/figs/Tcellproportion.svg", plot = Tcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
-ggsave(filename = "~/brazil-data/figs/Tcellproportion.jpg", plot = Tcell, device = "jpg",width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/Tcellproportion.jpg", plot = Tcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 ###########ERYTHROCYTE
-counts.bra.filt1.e<-counts.bra.filt1 %>%
+counts.br.filt1.e<-counts.br.filt1 %>%
   filter(MajorGroup=="Eryth")
-fwrite(counts.bra.filt1.e, "~/data/table-eryth.txt")
+fwrite(counts.br.filt1.e, "~/data/table-eryth.txt")
 
-#Some LatinCells dataset does not have eryth cell type, we need to aggregate a representative column 
-counts.bra.filt1.e<-fread("~/data/table-eryth.txt")
+#Some SiteCELL dataset does not have eryth cell type, we need to aggregate a representative column 
+counts.br.filt1.e<-fread("~/data/table-eryth.txt")
 
-e.overallmean<-mean(counts.bra.filt1.e$Mean_perc_mg, na.mr=TRUE)
+e.overallmean<-mean(counts.br.filt1.e$Mean_perc_mg, na.mr=TRUE)
 
-erythcell<-ggplot(counts.bra.filt1.e, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
+erythcell<-ggplot(counts.br.filt1.e, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
   geom_bar(stat="identity",position="dodge") +
   coord_flip()+
-  #geom_point(aes(MajorGroup),size=2.2)+
   geom_errorbar(aes(ymin=Mean_perc_mg, ymax=Mean_perc_mg+SD_perc_mg), width=.2,
                 position=position_dodge(.9))+
   geom_hline(yintercept = e.overallmean, linetype = "dashed", color = "#1c9099", linewidth = 0.5, alpha=0.5) +
@@ -816,21 +791,20 @@ erythcell<-ggplot(counts.bra.filt1.e, aes(x = reorder(Treatment, Mean_perc_mg), 
         axis.text = element_text(size = 6),              
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/brazil-data/figs/Erythcellproportion.svg", plot = erythcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
-ggsave(filename = "~/brazil-data/figs/Erythcellproportion.jpg", plot = erythcell, device = "jpg",width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/Erythcellproportion.jpg", plot = erythcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 ##############3PLATELETS
-counts.bra.filt1.p<-counts.bra.filt1 %>%
+counts.br.filt1.p<-counts.br.filt1 %>%
   filter(MajorGroup=="Platelet")
 
-#Latincells2 does not present any platelet count, we must to add a representative mock column
-dt2 <- data.frame(Treatment = "LatinCells2", MajorGroup = "Platelet", Mean_perc_mg=0, SD_perc_mg=0, Var_perc_mg=0, SE_perc_mg=0)
-counts.bra.filt1.p.2 <- rbind(counts.bra.filt1.p, dt2)
+#SiteCELL2 does not present any platelet count, we must to add a representative mock column
+dt2 <- data.frame(Treatment = "SiteCELL2", MajorGroup = "Platelet", Mean_perc_mg=0, SD_perc_mg=0, Var_perc_mg=0, SE_perc_mg=0)
+counts.br.filt1.p.2 <- rbind(counts.br.filt1.p, dt2)
 
 
-p.overallmean<-mean(counts.bra.filt1.p$Mean_perc_mg, na.mr=TRUE)
+p.overallmean<-mean(counts.br.filt1.p$Mean_perc_mg, na.mr=TRUE)
 
-plateletcell<-ggplot(counts.bra.filt1.p, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
+plateletcell<-ggplot(counts.br.filt1.p, aes(x = reorder(Treatment, Mean_perc_mg), y = Mean_perc_mg, fill =Treatment, group = Treatment)) +
   geom_bar(stat="identity",position="dodge") +
   coord_flip()+
   #geom_point(aes(MajorGroup),size=2.2)+
@@ -849,16 +823,15 @@ plateletcell<-ggplot(counts.bra.filt1.p, aes(x = reorder(Treatment, Mean_perc_mg
         axis.text = element_text(size = 6),                
         legend.text = element_text(size = 6))
 
-ggsave(filename = "~/brazil-data/figs/Plateletcellproportion.svg", plot = plateletcell, device = "svg",width = 6.15, height = 4.32, dpi = 300, units = "cm")
-ggsave(filename = "~/brazil-data/figs/Plateletcellproportion.jpg", plot = plateletcell, device = "jpg",width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/Plateletcellproportion.jpg", plot = plateletcell, device = "jpg",width = 8, height = 6, dpi = 300)
 
 ###ALL
 #filter only platelets and eryth because of minor scale
-counts.bra.filt1.c.noep<-counts.bra.filt1.c %>%
+counts.br.filt1.c.noep<-counts.br.filt1.c %>%
   filter(MajorGroup %in% c("Eryth", "Platelet"))
 
 #filter out eryth and platelets
-counts.bra.filt1.c <- counts.bra.filt1.c %>%
+counts.br.filt1.c <- counts.br.filt1.c %>%
   filter(MajorGroup != "Platelet")%>%
   filter(MajorGroup != "Eryth")%>%
   group_by(MajorGroup) %>%
@@ -867,7 +840,7 @@ counts.bra.filt1.c <- counts.bra.filt1.c %>%
   mutate(MajorGroup = reorder(MajorGroup, -MeanTotal))  # el signo "-" ordena de mayor a menor
 
 #plotting only PBMCs
-br.pbmc.prop<-ggplot(counts.bra.filt1.c, aes(x = MajorGroup, y = Mean_perc_mg, fill = Treatment)) +
+br.pbmc.prop<-ggplot(counts.br.filt1.c, aes(x = MajorGroup, y = Mean_perc_mg, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   labs(x = "Cell Type", y = "Mean Proportion (%)", fill = "Treatment") +
   theme_classic() +
@@ -875,17 +848,16 @@ br.pbmc.prop<-ggplot(counts.bra.filt1.c, aes(x = MajorGroup, y = Mean_perc_mg, f
                     ymax=Mean_perc_mg + SD_perc_mg),
                 position = position_dodge(width=0.9),
                 width=0.2, linewidth=0.2)+
-  scale_fill_manual(values = c("Ficoll" = "#a6bddb", "LatinCells" = "#1c9099")) +
+  scale_fill_manual(values = c("Ficoll" = "#a6bddb", "SiteCELL" = "#1c9099")) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggsave(filename = "~/brazil-data/figs/pbmc-prop-br.svg", plot = br.pbmc.prop, device = "svg",width = 8, height = 6, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/pbmc-prop-br.jpg", plot = br.pbmc.prop, device = "jpg",width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/pbmc-prop-br.jpg", plot = br.pbmc.prop, device = "jpg",width = 8, height = 6, dpi = 300)
 
 #plotting only contamination
 #assign NAs to zeros
-counts.bra.filt1.c.noep[is.na(counts.bra.filt1.c.noep)]<-0
+counts.br.filt1.c.noep[is.na(counts.br.filt1.c.noep)]<-0
 
-br.cont.prop<-ggplot(counts.bra.filt1.c.noep, aes(x = MajorGroup, y = Mean_perc_mg, fill = Treatment)) +
+br.cont.prop<-ggplot(counts.br.filt1.c.noep, aes(x = MajorGroup, y = Mean_perc_mg, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   labs(x = "Cell Type", y = "Mean Proportion (%)", fill = "Treatment") +
   scale_y_continuous(limits = c(0, 0.015),
@@ -895,20 +867,19 @@ br.cont.prop<-ggplot(counts.bra.filt1.c.noep, aes(x = MajorGroup, y = Mean_perc_
                 position = position_dodge(width=0.9),
                 width=0.2, linewidth=0.2)+
   theme_classic() +
-  scale_fill_manual(values = c("Ficoll" = "#a6bddb", "LatinCells" = "#1c9099")) +
+  scale_fill_manual(values = c("Ficoll" = "#a6bddb", "SiteCELL" = "#1c9099")) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggsave(filename = "~/brazil-data/figs/cont-prop-br.svg", plot = br.cont.prop, device = "svg",width = 8, height = 6, dpi = 300)
-ggsave(filename = "~/brazil-data/figs/cont-prop-br.jpg", plot = br.cont.prop, device = "jpg",width = 8, height = 6, dpi = 300)
+ggsave(filename = "~/brmatched-data/figs/cont-prop-br.jpg", plot = br.cont.prop, device = "jpg",width = 8, height = 6, dpi = 300)
 
 
-meta.mtRNA.brazil.1<-meta.mtRNA.brazil %>%
+meta.mtRNA.brmatched.1<-meta.mtRNA.brmatched %>%
   group_by(Protocol) %>%
   summarise(
     mean_mtRNA = mean(mitoPercent, na.rm = TRUE), 
     sd_mtRNA = sd(mitoPercent, na.rm = TRUE))
 
-meta.mtRNA.brazil.1<-meta.mtRNA.brazil %>%
+meta.mtRNA.brmatched.1<-meta.mtRNA.brmatched %>%
   group_by(Protocol) %>%
   summarise(n_mito_high=sum(mitoPercent>15, na.mr=TRUE))
     
