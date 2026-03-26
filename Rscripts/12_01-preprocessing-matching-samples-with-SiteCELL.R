@@ -19,11 +19,11 @@ library(pacman)
 library(Azimuth)
 
 
-setwd("~/brazil-data/")
 
-##### B23
+##### Library B23 - PBMCs were isolated with SiteCELL protocol
 
-B23<-Read10X("~/brazil-data/Cellranger/B23-brazil/filtered_feature_bc_matrix/")
+####Preprocessing
+B23<-Read10X("~/B23-matched/filtered_feature_bc_matrix/")
 B23<-CreateSeuratObject(counts = B23, min.cells = 3, min.features = 200)
 
 #Add column of mitochondrial rna
@@ -38,7 +38,7 @@ metadata_B23<-B23@meta.data
 View(metadata_B23) #17570 barcodes
 
 #Import demux best-file
-demuxB23<-read.table(file="~/brazil-data/demuxlet/B23/demuxlet-B23.best", header = T) 
+demuxB23<-read.table(file="~/B23/demuxlet-B23.best", header = T) 
 
 #Check for matching barcodes
 matching_rows<-merge(metadata_B23, demuxB23, by="BARCODE")
@@ -94,27 +94,27 @@ LCBR0093 LCBR0094 LCBR0095 LCBR0096
 
 #SUBSET BY PATIENT
 LCBR0093<-subset(filt.B23, subset = Patient == 'LCBR0093')
-saveRDS(LCBR0093, file = "~/brazil-data/RDSs/LCBR0093-B23.rds")
+saveRDS(LCBR0093, file = "~/LCBR0093-B23.rds")
 
 
 #subset by patient
 LCBR0094<-subset(filt.B23, subset = Patient == 'LCBR0094')
-saveRDS(LCBR0094, file = "~/brazil-data/RDSs/LCBR0094-B23.rds")
+saveRDS(LCBR0094, file = "~/LCBR0094-B23.rds")
 
 #subset by patient
 LCBR0095<-subset(filt.B23, subset = Patient == 'LCBR0095')
-saveRDS(LCBR0095, file = "~/brazil-data/RDSs/LCBR0095-B23.rds")
+saveRDS(LCBR0095, file = "~/LCBR0095-B23.rds")
 
 #subset by patient
 LCBR0096<-subset(filt.B23, subset = Patient == 'LCBR0096')
-saveRDS(LCBR0096, file = "~/brazil-data/RDSs/LCBR0096-B23.rds")
+saveRDS(LCBR0096, file = "~/LCBR0096-B23.rds")
 
 #MERGE PATIENTS
 merged.b23<-merge(x=LCBR0093, y=c(LCBR0094,LCBR0095,LCBR0096), 
                  add.cell.ids=ls()[6:9])
 
 #save merged
-saveRDS(merged.b23, file = "~/brazil-data/RDSs/merged-B23.rds")
+saveRDS(merged.b23, file = "~/matched-data/RDSs/merged-B23.rds")
 
 merged.b23<-NormalizeData(merged.b23)
 merged.b23<-FindVariableFeatures(merged.b23, selection.method = "vst", nfeatures = 3000)
@@ -145,17 +145,17 @@ DimPlot(int.B23, reduction = "umap.cca",group.by = c("seurat_clusters","RNA_snn_
 int.B23.j<-JoinLayers(int.B23)
 int.B23.m<-as.matrix(GetAssayData(int.B23.j, layer = 'counts')[, WhichCells(int.B23.j)])
 #Once created, RNA matrix needs to be converted into an RDS object.
-saveRDS(int.B23.m, file = "~/brazil-data/RDSs/B23-brazil.rds")
+saveRDS(int.B23.m, file = "~/matched-data/RDSs/B23-matched.rds")
 
 
 #ANNOTATION AS POOL
 #Origin list containing a list of barcodes of particulas interest that will be used as a reference
 #to mark those same genes in another list
-B23.o<-fread("~/brazil-data/azimuth-annotations/azimuth_pred_B23-brazil.tsv", stringsAsFactors = TRUE, header = TRUE)
+B23.o<-fread("~/matched-data/azimuth-annotations/azimuth_pred_B23-matched.tsv", stringsAsFactors = TRUE, header = TRUE)
 
-write.table(int.B23.j@meta.data, file = "~/brazil-data/B23_metadata.tsv", sep = '\t')
+write.table(int.B23.j@meta.data, file = "~/matched-data/B23_metadata.tsv", sep = '\t')
 #Target list in which genes are going to be tagged if they have a matching barcode in a shorter list containing genes of interest
-B23.t<-fread("~/brazil-data/B23_metadata.tsv", stringsAsFactors = TRUE)
+B23.t<-fread("~/matched-data/B23_metadata.tsv", stringsAsFactors = TRUE)
 
 #Tagging barcode list
 B23.o$Filtered<-"*"
